@@ -1425,3 +1425,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })();
+
+
+// ── Downloader promo card: eye menu + permanent dismissal ──────────────
+(function(){
+  const KEY='ytdlPromoDismissed';
+  const card=document.getElementById('dl-ad'); if(!card) return;
+  const eye=document.getElementById('dl-ad-eye');
+  const menu=document.getElementById('dl-ov-menu');
+  const msg=document.getElementById('dl-ov-msg');
+  const ico=document.getElementById('dl-ov-msg-ico');
+  const title=document.getElementById('dl-ov-msg-title');
+  const text=document.getElementById('dl-ov-msg-text');
+
+  chrome.storage.local.get([KEY],(r)=>{ if(!(r&&r[KEY])) card.style.display=''; });
+
+  eye.addEventListener('click',(e)=>{
+    e.preventDefault(); e.stopPropagation();
+    if(msg.style.display!=='none') return;
+    card.classList.toggle('ov-open');
+  });
+
+  function finish(kind,t,body,delay){
+    menu.style.display='none'; msg.style.display='flex';
+    ico.className='dl-ov-msg-ico'+(kind==='info'?' info':'');
+    ico.textContent=kind==='info'?'i':'✓';
+    title.textContent=t; text.innerHTML=body;
+    chrome.storage.local.set({[KEY]:true});
+    setTimeout(()=>{
+      card.classList.add('closing');
+      setTimeout(()=>{ card.style.display='none'; },360);
+    },delay);
+  }
+
+  document.getElementById('dl-ov-installed').addEventListener('click',()=>{
+    finish('ok','All set — thank you!','Thanks for using <strong>Yt-Downloader</strong>. Enjoy your downloads, and we hope you love it!',15000);
+  });
+  document.getElementById('dl-ov-skip').addEventListener('click',()=>{
+    finish('info','Okay, fine!','If you ever need to download videos, do check the extension — it\'s really fast and supports various formats and qualities, from <strong>360p up to 8K</strong>. Just click <strong>Follow Dev</strong> and you\'ll find it.',15000);
+  });
+})();
